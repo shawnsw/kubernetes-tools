@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+if [[ $# -eq 0 ]] ; then
+	kubectl get ns
+elif [[ $# -eq 1 ]] && [[ $1 != "-h" ]] ; then
+	kubectl get ns | grep $1
+elif [[ $# -eq 1 ]] && [[ $1 == "-h" ]] ; then
+    echo "Kubernetes Tools - kns"
+    echo
+    echo "List all namespaces: kns"
+    echo "Search [namespace]: kns [namespace]"
+else
+	echo "invalid parameters, use -h for help"
+fi

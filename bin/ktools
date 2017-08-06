@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+echo "Kubernetes Tools v1.0.0"
+echo
+echo "===Operation==="
+echo "kcontext: Get current context, set new context"
+echo "kns: Get all namespaces, search namespace by keyword"
+echo "kpod: Get pod in all namespaces or specified namespace"
+echo "kelb: Get ELBs of all namespaces or specified namespace"
+echo "kall: Get all resources of specified namespace"
+echo "kds: Descirbe pod or specified resource in specified namespace"
+echo
+echo "===Debug==="
+echo "klogs: Get logs of a selected container, or all containers in all pods of a namespace"
+echo "ksick: Get all unhealthy pods in all namespaces"
+echo "kexec: Get a shell of a selected container of specified namespace"
+echo "kssh: tmux into all nodes, or ssh into a specified node"
+echo
+echo "===Maintenance==="
+echo "kbak: Backup and restore namespace/cluster"
+echo
+echo "For usage of each tool, run [tool_name] -h"

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+if [[ $# -eq 0 ]] ; then
+	echo -e "Listing pods from all namespaces\n"
+	kubectl get pod --all-namespaces
+elif [[ $# -eq 1 ]] && [[ $1 != "-h" ]] ; then
+	echo -e "Listing pods in namespace $1\n"
+	kubectl get pod -n $1
+elif [[ $# -eq 1 ]] && [[ $1 == "-h" ]] ; then
+    echo "Kubernetes Tools - kpod"
+    echo
+    echo "List pods from all namespaces: kpod"
+    echo "List pods in [namespace]: kpod [namespace]"
+else
+	echo "invalid parameters, use -h for help"
+fi

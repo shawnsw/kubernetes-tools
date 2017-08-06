@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+path=$(readlink "$0")
+app_root=$(dirname $(dirname ${path:-"$0"}))
+source $app_root/helper/__tmux
+
+if ([[ $# -eq 1 ]] && [[ $1 != '-h' ]]) || ([[ $# -eq 2 ]] && [[ $2 == '-f' ]]) ; then
+	echo "Pods in the specified namespace:"
+	PS3="Please select a pod:"
+	OLD_IFS="$IFS"
+	IFS=$'\n'
+	pods=($(kubectl get pod -n $1|awk '{print $1}'|sed '1d'))
+	IFS="$OLD_IFS"
+	
+	select pod in "${pods[@]}"
+	do 
+		PS3="Please select a container:"
+		containers=($(kubectl get pod $pod -n $1 -o jsonpath='{.spec.containers[*].name}'))
+		
+		select container in "${containers[@]}"
+		do 
+			kubectl logs $2 $pod $container -n $1
+		done
+	done
+
+elif ([[ $# -eq 2  ]] && [[ $2 == '-a' ]]) || ([[ $# -eq 3  ]] && [[ $2 == '-a' ]] && [[ $3 == '-f' ]]) ; then
+	echo "Getting logs of all pods in $1"
+	pods=($(kubectl get pod -n $1|awk '{print $1}'|sed '1d'))
+
+	# declare commands array to hold the k logs commands
+	declare -a commands=("")
+
+	# loop through all pods
+	for pod in "${pods[@]}"; do
+		containers=($(kubectl get pod $pod -n $1 -o jsonpath='{.spec.containers[*].name}'))
+
+		# loop through all containers in the pod
+		for container in "${containers[@]}"; do
+			# build the commands array
+			commands=("${commands[@]}" "kubectl logs $3 $pod $container -n $1")
+		done
+	done
+
+	# build session name
+	session_name="klogs_$(date +%m%d%H%M%S)"
+
+	# call tmux
+	__tmux $session_name
+elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == "-h" ]]) ; then
+    echo "Kubernetes Tools - klogs"
+    echo
+	echo "Get logs of selected pod in [namespace], speficy -f for flow mode: klogs [namespace] [-f]"
+	echo "Get logs of all pods in [namespace], speficy -f for flow mode: klogs [namespace] -a [-f]"
+else
+	echo "invalid parameters, use -h for help"
+fi
