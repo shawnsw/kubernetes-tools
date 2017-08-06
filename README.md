@@ -5,34 +5,35 @@ Kubernetes tools is a set of programs that help you operate your Kubernetes clus
 
 ## Installation
 
-#### Mac
+### Install using brew
 ```sh
 brew tap shawnxlw/tap
 brew install kubernetes-tools
+ktools init
 ```
 
-#### Linux
+### Manual installation
 ```sh
 cd ~
 git clone https://github.com/shawnxlw/kubernetes-tools
-# add the follow to your .bash_profile or .zshrc or whatever
+# add the follow to your .bash_profile or .zshrc
 PATH=$HOME/kubernetes-tools/bin:$PATH
+# set up tab completion
+ktools init
 ```
 
-#### BASH completion
+##### BASH completion
 Add the following into your `.bash_profile`:  
 ```sh
-# load tab completion script for kubernetes tools
-source /usr/local/Cellar/kubernetes-tools/<version>/completion/__completion`
+source $HOME/kubernetes-tools/completion/__completion`
 ```
 
-#### ZSH completion
+##### ZSH completion
 Add the following into your `.zshrc`:  
 ```sh
-# load tab completion script for kubernetes tools
 autoload -U compaudit compinit bashcompinit
 compaudit && compinit && bashcompinit
-source /usr/local/Cellar/kubernetes-tools/<version>/completion/__completion`
+source $HOME/kubernetes-tools/completion/__completion`
 ```
 
 ## Usage
