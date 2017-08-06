@@ -7,7 +7,7 @@ Kubernetes tools is a set of programs that help you operate your Kubernetes clus
 
 ### Install using brew
 ```sh
-brew tap shawnxlw/tap
+brew tap shawnxlw/homebrew-tap
 brew install kubernetes-tools
 ktools init
 ```
