@@ -32,7 +32,7 @@ function tab_completion() {
 }
 
 if [[ $# -eq 1 ]] && [[ $1 == "init" ]]; then
-	path=$(readlink "$0")
+	path=$(greadlink -f "$0")
 	app_root=$(dirname $(dirname ${path:-"$0"}))
 
 	# set up tab completion
