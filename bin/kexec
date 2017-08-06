@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+if [[ $# -eq 1 ]] && [[ $1 != '-h' ]] ; then
+    echo "Pods in the specified namespace:"
+    PS3="Please select a pod:"
+    
+    OLD_IFS="$IFS"
+    IFS=$'\n'
+    # get all pods
+    pods=($(kubectl get pod -n $1|awk '{print $1}'|sed '1d'))
+    IFS="$OLD_IFS"
+
+    select pod in "${pods[@]}"
+    do
+        PS3="Please select a container:"
+        containers=($(kubectl get pod $pod -n $1 -o jsonpath='{.spec.containers[*].name}'))
+        
+        echo -e "\nContainers in $pod"
+        select container in "${containers[@]}"
+        do
+            echo -e "\nGetting you a shell in $container...\n"
+            # if bash doesn't work, try sh
+            if ! (kubectl exec $pod -c $container -ti bash -n $1); then
+                kubectl exec $pod -c $container -ti sh -n $1
+            fi
+        done
+    done
+elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == "-h" ]]) ; then
+    echo "Kubernetes Tools - kexec"
+    echo
+    echo "Get a shell of a selected container of specified [namespace]: kexec [namespace]"
+else
+    echo "invalid parameters, use -h for help"
+fi
+
+#_tmux 'echo hello' 'ls'

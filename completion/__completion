@@ -1,0 +1,69 @@
+__namespaces ()
+{
+  # pointer to current completion word.
+  local cur
+
+  # array variable storing the possible completions.
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  namespaces=$(kubectl get ns |sed '1d'|awk '{print $1}')
+
+  COMPREPLY=( $( compgen -W "$namespaces" -- $cur ) )
+
+  case "$cur" in
+    -*)
+    # generate the completion matches and load them into $COMPREPLY array.
+    COMPREPLY=( $( compgen -W '-h -s' -- $cur ) );;
+  esac
+
+  return 0
+}
+
+__contexts ()
+{
+  # pointer to current completion word.
+  local cur
+
+  # array variable storing the possible completions.
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  contexts=$(kubectl config get-contexts |sed -e "s/\*//"|sed '1d'|awk '{print $1}')
+
+  COMPREPLY=( $( compgen -W "$contexts" -- $cur ) )
+
+  case "$cur" in
+    -*)
+    # generate the completion matches and load them into $COMPREPLY array.
+    COMPREPLY=( $( compgen -W '-h -s' -- $cur ) );;
+  esac
+
+  return 0
+}
+
+__nodes ()
+{
+  # pointer to current completion word.
+  local cur
+
+  # array variable storing the possible completions.
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  ips=$(kubectl get nodes -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
+
+  COMPREPLY=( $( compgen -W "$ips" -- $cur ) )
+
+  case "$cur" in
+    -*)
+    # generate the completion matches and load them into $COMPREPLY array.
+    COMPREPLY=( $( compgen -W '-h -s' -- $cur ) );;
+  esac
+
+  return 0
+}
+
+# apply autocompletions
+complete -F __namespaces kpod kds kall klogs kexec kbak kelb
+complete -F __contexts kcontext
+complete -F __nodes kssh
+
+# remove autocompletion cache files e.g. .zcompdump after making changes

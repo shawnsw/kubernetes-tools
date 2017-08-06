@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+
+if [[ $# -eq 0 ]] ; then
+	echo "Current Context: \"$(kubectl config current-context)\""
+elif [[ $# -eq 1 ]] && [[ $1 != '-h' ]] ; then
+	echo "Switching from \"$(kubectl config current-context)\" to \"$1\""
+	kubectl config use-context $1
+	echo "Current Context: \"$(kubectl config current-context)\""
+elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == '-h' ]]) ; then
+	echo "Kubernetes Tools - kcontext"
+    echo
+    echo "Get current context: kcontext"
+    echo "Switch to specified [context]: kcontext [context]"
+else
+	echo "invalid parameters, use -h for help"
+fi

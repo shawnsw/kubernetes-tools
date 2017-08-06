@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+if [[ $# -eq 0 ]] ; then
+	echo "Listing all pods that are not in Running state: ksick"
+	kubectl get pod --all-namespaces | grep -v Running
+elif [[ $# -eq 2 ]] && [[ $1 == '-c' ]] && [[ $2 =~ ^[0-9]+$ ]] || [[ $# -eq 1 ]] && [[ $1 == '-c' ]] ; then
+	echo "Listing all pods that have a high restart count (default: 100): ksick -c [integer]"
+
+	threshold=${2:-100}
+	kubectl get pod --all-namespaces | while read line; do
+		count=$(echo $line | awk {'print $5'})
+		if [[ $count -gt $threshold ]]; then
+			echo $line;
+		fi
+	done
+elif [[ $# -eq 1 ]] && [[ $1 == "-h" ]] ; then
+    echo "Kubernetes Tools - ksick"
+    echo
+    echo "List all pods that are not in Running state: ksick"
+    echo "List all pods that have a high restart count (default threshold: 100): ksick -c [threshold]"
+else
+	echo "invalid parameters, use -h for help"
+fi

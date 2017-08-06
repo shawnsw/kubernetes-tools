@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Shawn Wang
+#
+# You may use, distribute or modify this software under the terms of the MIT license.
+#
+# You should have received a copy of the MIT license with the software. 
+# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
+
+# backup namespace and its resources
+function backup() {
+	# note that some resources like statefulsets or cronjobs are not available in all versions
+	kubectl get --namespace=${1} --export -o=json secrets,configmaps,persistentvolume,persistentvolumeclaim,deployments,replicationcontrollers,daemonsets,services,ingresses | \
+	jq '.items[] |
+	    select(.type!="kubernetes.io/service-account-token") |
+	    del(
+	        .spec.clusterIP,
+			.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+	        .metadata.uid,
+	        .metadata.selfLink,
+	        .metadata.resourceVersion,
+	        .metadata.creationTimestamp,
+	        .metadata.generation,
+	        .status,
+	        .nodePort,
+	        .spec.template.spec.securityContext,
+	        .spec.template.spec.dnsPolicy,
+	        .spec.template.spec.terminationGracePeriodSeconds,
+	        .spec.template.spec.restartPolicy
+	    )'
+}
+
+# restore namespace and its resources
+function restore() {
+	namespace=$(jq -r '[.metadata]|.[]|.namespace' $1|head -n 1)
+
+	if [[ $(kubectl get ns | grep $namespace) ]]; then
+		echo "Namespace ${namespace} already exist, press [ENTER] to continue..."
+		read
+	else
+		echo "Namespace ${namespace} does not exist, re-creating"
+		kubectl create ns $namespace
+	fi
+
+	kubectl apply -f $1
+	echo "Restored namespace ${namespace} from $1"
+}
+
+# backup all namespaces
+if [[ $# -eq 1 ]] && [[ $1 == '--all' ]] ; then
+	echo "Backing up all namespaces"
+	for ns in $(kubectl get ns --no-headers | cut -d " " -f1); do
+		if { [ "$ns" != "kube-system" ]; }; then
+			filepath=${PWD}/${ns}-backup-$(date +%Y-%m-%d_%H-%M).json
+ 			backup $ns >> $filepath
+ 			echo "${ns} backed up to $filepath"
+		fi
+	done
+
+# backup namespace
+elif [[ $# -eq 1  ]] && [[ $1 != '--all' ]] && [[ $1 != '-h' ]] ; then
+	echo "Backing up namespace $1"
+	filepath=${PWD}/${1}-backup-$(date +%Y-%m-%d_%H-%M).json
+	backup $1 >> $filepath
+	echo "Backup saved to ${filepath}"
+
+# restore all namespaces
+elif [[ $# -eq 2 ]] && [[ $2 == '--restore-all' ]] ; then
+	echo "Restoring all namespaces from backup folder $1"
+	for filename in ${1%/}/*.json; do
+		restore $filename
+	done
+
+# restore namespace
+elif [[ $# -eq 2 ]] && [[ $2 == '--restore' ]] ; then
+	restore $1
+
+# help message
+elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == '-h' ]]) ; then
+	echo "Kubernetes Tools - kbak"
+    echo
+ 	echo "Backup [namespace]: kbak [namespace]"
+	echo "Backup all namespaces: kbak --all"
+	echo "Restore namespace from [file]: kbak [file] --restore"
+	echo "Restore all namespaces from [folder]: kbak [folder] --restore-all"
+# exit if parameters invalid
+else
+	echo "invalid parameters, use -h for help"
+fi
+
