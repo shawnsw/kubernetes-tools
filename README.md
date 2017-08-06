@@ -65,3 +65,8 @@ For usage of each tool, run ```[tool_name] -h```
 
 ## License
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+## Release Note
+v1.0.0 - 07/08/2017
+
+Initial release

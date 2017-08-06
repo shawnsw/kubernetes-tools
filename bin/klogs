@@ -7,7 +7,7 @@
 # You should have received a copy of the MIT license with the software. 
 # If not, you can obtain a copy from: https://opensource.org/licenses/MIT
 
-path=$(readlink "$0")
+path=$(greadlink -f "$0")
 app_root=$(dirname $(dirname ${path:-"$0"}))
 source $app_root/helper/__tmux
 
