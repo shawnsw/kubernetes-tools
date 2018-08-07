@@ -1,7 +1,27 @@
 # Kubernetes Tools
 
-Kubernetes tools is a set of programs that help you operate your Kubernetes clusters more efficiently.
+Kubernetes Tools is a set of programs that helps with your Kubernetes operations.
 
+#### Available tools
+```
+===Operation===
+kns: Specify default namespace
+kctx: List and switch contexts
+kpod: List pods in specified namespace
+kds: Descirbe pod in specified namespace
+
+===Debug===
+kcp: Copy common cli tools to selected container
+kexec: Get a shell of a selected container
+
+===Maintenance===
+kbak: Backup and restore namespace/cluster
+```
+
+#### How to use
+To list all the available tools, run ```ktools```
+
+For usage of each tool, run ```[tool_name] -h```
 
 ## Installation
 
@@ -36,37 +56,13 @@ compaudit && compinit && bashcompinit
 source $HOME/kubernetes-tools/completion/__completion`
 ```
 
-## Usage
-
-#### Available tools
-```
-===Operation===
-kcontext: Get current context, set new context
-kns: Get all namespaces, search namespace by keyword
-kpod: Get pod in all namespaces or specified namespace
-kelb: Get ELBs of all namespaces or specified namespace
-kall: Get all resources of specified namespace
-kds: Descirbe pod or specified resource in specified namespace
-
-===Debug===
-klogs: Get logs of a selected container, or all containers in all pods of a namespace
-ksick: Get all unhealthy pods in all namespaces
-kexec: Get a shell of a selected container of specified namespace
-kssh: tmux into all nodes, or ssh into a specified node
-
-===Maintenance===
-kbak: Backup and restore namespace/cluster
-```
-
-#### How to use
-To list all the available tools, run ```ktools```
-
-For usage of each tool, run ```[tool_name] -h```
-
 ## License
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Release Note
-v1.0.0 - 07/08/2017
+v1.2.0 - 08/08/2018
+- Updated kexec, kns, kpod, kctx, kds
+- Added kcp
 
-Initial release
+v1.0.0 - 07/08/2017
+- Initial release
