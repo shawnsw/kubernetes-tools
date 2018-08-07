@@ -26,6 +26,7 @@ if ([[ $# -eq 1 ]] && [[ $1 != '-h' ]]) || ([[ $# -eq 2 ]] && [[ $2 == '-f' ]]) 
 		select container in "${containers[@]}"
 		do 
 			kubectl logs $2 $pod $container -n $1
+      exit 0
 		done
 	done
 

@@ -62,7 +62,7 @@ __nodes ()
 }
 
 # apply autocompletions
-complete -F __namespaces kpod kds kall klogs kexec kbak kelb
+complete -F __namespaces kpod kns kctx kds klogs kexec kcp kbak
 complete -F __contexts kcontext
 complete -F __nodes kssh
 

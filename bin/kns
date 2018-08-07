@@ -6,15 +6,49 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 
-if [[ $# -eq 0 ]] ; then
-	kubectl get ns
-elif [[ $# -eq 1 ]] && [[ $1 != "-h" ]] ; then
-	kubectl get ns | grep $1
-elif [[ $# -eq 1 ]] && [[ $1 == "-h" ]] ; then
-    echo "Kubernetes Tools - kns"
-    echo
-    echo "List all namespaces: kns"
-    echo "Search [namespace]: kns [namespace]"
-else
-	echo "invalid parameters, use -h for help"
-fi
+# prompt ns select
+select_ns() {
+  PS3="Please select a namespace:"
+  OLD_IFS="$IFS"
+  IFS=$'\n'
+  NAMESPACES=($(kubectl get ns |awk '{print $1}'|sed '1d'))
+  IFS="$OLD_IFS"
+
+  select namespace in "${NAMESPACES[@]}"
+  do
+    update_context $namespace
+    break
+  done
+}
+
+# update context
+update_context() {
+    echo -e "\nSetting $1 as default namespace in current context...\n"
+    kubectl config set-context $(kubectl config current-context) --namespace=$1
+    exit 0
+}
+
+# sohw help
+show_help() {
+  echo -e "Kubernetes Tools - kns"
+  echo -e "- Select a default namespace: kns"
+  echo -e "- Specify a default [namespace]: kns [-n] [namespace]\n"
+}
+
+show_help
+# parse arguments
+while [ "$1" != "" ]; do
+  case $1 in
+    -n | --namespace ) shift
+      update_context $1
+      ;;
+    -h | --help ) shift
+      exit 0
+      ;;
+    * ) update_context $1
+  esac
+  shift
+done
+
+# prompt namespace selection if no arguments
+select_ns

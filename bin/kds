@@ -6,26 +6,43 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 
-if ([[ $# -eq 1 ]] && [[ $1 != '-h' ]]) || [[ $# -eq 2 ]] ; then
-	resource=${2:-pod}
-	PS3="Please select a $resource:"
-	
-	OLD_IFS="$IFS"
-	IFS=$'\n'
-	resources=($(kubectl get $resource -n $1|awk '{print $1}'|sed '1d'))
-	IFS="$OLD_IFS"
-	
-	echo -e "All $resource in $1"
-	select res_name in "${resources[@]}"
-	do 
-		kubectl describe $resource $res_name -n $1
-		echo
-	done
-elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == '-h' ]]) ; then
-	echo "Kubernetes Tools - kds"
-    echo
-    echo "Describe selected pod of [namespace]: kds [namespace]"
-    echo "Describe specified [resource] of [namespace]: kds [namespace] [resource]"
-else
-	echo "invalid parameters, use -h for help"
-fi
+describe_pod() {
+  PS3="Please select a pod:"
+  
+  OLD_IFS="$IFS"
+  IFS=$'\n'
+  pods=($(/bin/sh -c "kubectl get pod $1"|awk '{print $1}'|sed '1d'))
+  IFS="$OLD_IFS"
+  
+  select pod in "${pods[@]}"
+  do 
+    /bin/sh -c "kubectl describe pod $pod $1"
+    break
+  done
+  exit 0
+}
+
+# sohw help
+show_help() {
+  echo -e "Kubernetes Tools - kds"
+  echo -e "- Describe selected pod of default namespace: kds"
+  echo -e "- Describe selected pod of specified [namespace]: kds [namespace]\n"
+}
+
+show_help
+# parse arguments
+while [ "$1" != "" ]; do
+  case $1 in
+    -n | --namespace ) shift
+      describe_pod "-n $1"
+      ;;
+    -h | --help ) shift
+      exit 0
+      ;;
+    * ) describe_pod "-n $1"
+  esac
+  shift
+done
+
+# describe pod in current namespace if no argument specified
+describe_pod

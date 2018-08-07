@@ -5,38 +5,61 @@
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
 
+get_shell() {
+  namespace=$1
+  PS3="Please select a pod:"
+  OLD_IFS="$IFS"
+  IFS=$'\n'
+  # get all pods
+  pods=($(/bin/sh -c "kubectl get pod $namespace"|awk '{print $1}'|sed '1d'))
+  IFS="$OLD_IFS"
+  # select a pod
+  select pod in "${pods[@]}"
+  do
+      PS3="Please select a container:"
+      containers=($(/bin/sh -c "kubectl get pod $pod $namespace -o jsonpath='{.spec.containers[*].name}'"))
 
-if [[ $# -eq 1 ]] && [[ $1 != '-h' ]] ; then
-    echo "Pods in the specified namespace:"
-    PS3="Please select a pod:"
-    
-    OLD_IFS="$IFS"
-    IFS=$'\n'
-    # get all pods
-    pods=($(kubectl get pod -n $1|awk '{print $1}'|sed '1d'))
-    IFS="$OLD_IFS"
-
-    select pod in "${pods[@]}"
-    do
-        PS3="Please select a container:"
-        containers=($(kubectl get pod $pod -n $1 -o jsonpath='{.spec.containers[*].name}'))
-        
-        echo -e "\nContainers in $pod"
+      # if there is only one container, get a shell
+      if [[ ${#containers[@]} -eq 1 ]] ; then
+        selected_container=$containers
+      else
+        # if there are more than one container, prompt select
         select container in "${containers[@]}"
         do
-            echo -e "\nGetting you a shell in $container...\n"
-            # if bash doesn't work, try sh
-            if ! (kubectl exec $pod -c $container -ti bash -n $1); then
-                kubectl exec $pod -c $container -ti sh -n $1
-            fi
+          selected_container=$container
+          break
         done
-    done
-elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == "-h" ]]) ; then
-    echo "Kubernetes Tools - kexec"
-    echo
-    echo "Get a shell of a selected container of specified [namespace]: kexec [namespace]"
-else
-    echo "invalid parameters, use -h for help"
-fi
+      fi
 
-#_tmux 'echo hello' 'ls'
+      echo -e "\nContainers in $pod"
+      echo -e "\nGetting you a shell in $selected_container...\n"
+      # if bash doesn't work, try sh
+      kubectl exec $pod -c $selected_container -ti bash $namespace 2>/dev/null || kubectl exec $pod -c $selected_container -ti sh $namespace
+      exit 0
+  done
+}
+
+# sohw help
+show_help() {
+  echo -e "Kubernetes Tools - kexec"
+  echo -e "- Get a shell of a selected container in current context: kexec"
+  echo -e "- Get a shell of a selected container in specified context: kexec [namespace]\n"
+}
+
+show_help
+# parse arguments
+while [ "$1" != "" ]; do
+  case $1 in
+    -n | --namespace ) shift
+      get_shell "-n $1"
+      ;;
+    -h | --help ) shift
+      exit 0
+      ;;
+    * ) get_shell "-n $1"
+  esac
+  shift
+done
+
+# prompt pod selection if no arguments
+get_shell

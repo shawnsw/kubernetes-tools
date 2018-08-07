@@ -6,17 +6,40 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 
-if [[ $# -eq 0 ]] ; then
-	echo "Current Context: \"$(kubectl config current-context)\""
-elif [[ $# -eq 1 ]] && [[ $1 != '-h' ]] ; then
+show_context() {
+	echo -e "Current Context: \"$(kubectl config current-context)\"\n"
+  echo "All Contexts:"
+  kubectl config get-contexts
+}
+
+switch_context() {
 	echo "Switching from \"$(kubectl config current-context)\" to \"$1\""
 	kubectl config use-context $1
 	echo "Current Context: \"$(kubectl config current-context)\""
-elif [[ $# -eq 0 ]] || ([[ $# -eq 1 ]] && [[ $1 == '-h' ]]) ; then
-	echo "Kubernetes Tools - kcontext"
-    echo
-    echo "Get current context: kcontext"
-    echo "Switch to specified [context]: kcontext [context]"
-else
-	echo "invalid parameters, use -h for help"
-fi
+  exit 0
+}
+
+# sohw help
+show_help() {
+  echo -e "Kubernetes Tools - kctx"
+  echo -e "- List current and all contexts: kctx"
+  echo -e "- Switch to specified [context]: kctx [context]\n"
+}
+
+show_help
+# parse arguments
+while [ "$1" != "" ]; do
+  case $1 in
+    -c | --context ) shift
+      switch_context $1
+      ;;
+    -h | --help ) shift
+      exit 0
+      ;;
+    * ) switch_context $1
+  esac
+  shift
+done
+
+# show current context if no argument specified
+show_context

@@ -6,17 +6,37 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 
-if [[ $# -eq 0 ]] ; then
-	echo -e "Listing pods from all namespaces\n"
-	kubectl get pod --all-namespaces
-elif [[ $# -eq 1 ]] && [[ $1 != "-h" ]] ; then
-	echo -e "Listing pods in namespace $1\n"
-	kubectl get pod -n $1
-elif [[ $# -eq 1 ]] && [[ $1 == "-h" ]] ; then
-    echo "Kubernetes Tools - kpod"
-    echo
-    echo "List pods from all namespaces: kpod"
-    echo "List pods in [namespace]: kpod [namespace]"
-else
-	echo "invalid parameters, use -h for help"
-fi
+# get pods
+get_pods() {
+  kubectl get pod $1
+  exit 0
+}
+
+# sohw help
+show_help() {
+  echo -e "Kubernetes Tools - kpod"
+  echo -e "- Get pods in current namespace: kpod"
+  echo -e "- Get pods in specified [namespace]: kpod [-n] [namespace]"
+  echo -e "- Get pods in all namespaces: kpod [-a]\n"
+}
+
+show_help
+# parse arguments
+while [ "$1" != "" ]; do
+  case $1 in
+    -n | --namespace ) shift
+      get_pods "-n $1"
+      ;;
+    -a | --all) shift
+      get_pods "--all-namespaces"
+      ;;
+    -h | --help ) shift
+      exit 0
+      ;;
+    * ) get_pods "-n $1"
+  esac
+  shift
+done
+
+# get pods in current namespace if no arguments specified
+get_pods
