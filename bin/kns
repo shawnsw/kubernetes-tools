@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Copyright (C) 2017 Shawn Wang
+# Kubernetes Tools - Copyright (C) 2017 Shawn Wang
+# https://github.com/shawnxlw/kubernetes-tools
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
-#
-# You should have received a copy of the MIT license with the software. 
-# If not, you can obtain a copy from: https://opensource.org/licenses/MIT
+
 
 if [[ $# -eq 0 ]] ; then
 	kubectl get ns
