@@ -1,3 +1,33 @@
+current_namespace() {
+  namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kuebctl config current-context)\")].context.namespace}")"
+  if [[ -z "${namespace}" ]]; then
+    echo default
+  else
+    echo $namespace
+  fi
+}
+
+__pods ()
+{
+  # pointer to current completion word.
+  local cur
+
+  # array variable storing the possible completions.
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  namespaces=$(kubectl get pod -n $(current_namespace)|sed '1d'|awk '{print $1}')
+
+  COMPREPLY=( $( compgen -W "$namespaces" -- $cur ) )
+
+  case "$cur" in
+    -*)
+    # generate the completion matches and load them into $COMPREPLY array.
+    COMPREPLY=( $( compgen -W '-h -s' -- $cur ) );;
+  esac
+
+  return 0
+}
+
 __namespaces ()
 {
   # pointer to current completion word.
@@ -62,8 +92,9 @@ __nodes ()
 }
 
 # apply autocompletions
-complete -F __namespaces kpod kns kctx kds klogs kexec kcp kbak
-complete -F __contexts kcontext
+complete -F __pods kds klogs kexec kcp
+complete -F __namespaces kpod kns kbak
+complete -F __contexts kctx
 complete -F __nodes kssh
 
 # remove autocompletion cache files e.g. .zcompdump after making changes

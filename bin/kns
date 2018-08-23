@@ -5,9 +5,23 @@
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
 
+source __common
+
+current_context() {
+  kubectl config current-context
+}
+
+list_namespaces() {
+  echo "Current Namespace: $(__current_namespace)"
+  echo "Current Context: $(current_context)"
+  echo
+  echo "All Namespaces in current context:"
+  kubectl get ns
+}
 
 # prompt ns select
 select_ns() {
+  echo -e "Setting default namespace:\n"
   PS3="Please select a namespace:"
   OLD_IFS="$IFS"
   IFS=$'\n'
@@ -31,16 +45,19 @@ update_context() {
 # sohw help
 show_help() {
   echo -e "Kubernetes Tools - kns"
-  echo -e "- Select a default namespace: kns"
-  echo -e "- Specify a default [namespace]: kns [-n] [namespace]\n"
+  echo -e "- List current and all namespaces: kns"
+  echo -e "- Select a default namespace: kns [-s|--select]"
+  echo -e "- Specify a default [namespace]: kns [-n|--namespace] [namespace]\n"
 }
 
-show_help
 # parse arguments
 while [ "$1" != "" ]; do
   case $1 in
     -n | --namespace ) shift
       update_context $1
+      ;;
+    -s | --select ) shift
+      select_ns
       ;;
     -h | --help ) shift
       exit 0
@@ -50,5 +67,5 @@ while [ "$1" != "" ]; do
   shift
 done
 
-# prompt namespace selection if no arguments
-select_ns
+# list namespaces if no arguments
+list_namespaces
