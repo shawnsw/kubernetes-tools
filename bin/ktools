@@ -59,9 +59,11 @@ while [ "$1" != "" ]; do
   case $1 in
     -i | --init ) shift
       init
+      exit
       ;;
     -h | --help ) shift
-      exit 0
+      show_help
+      exit
       ;;
     * ) exit 0
   esac
