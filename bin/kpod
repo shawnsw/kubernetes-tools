@@ -5,22 +5,27 @@
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
 
-
+source __common
 # get pods
 get_pods() {
   kubectl get pod $1
-  exit 0
+  exit
+}
+
+describe_pod() {
+  kubectl describe pod $1
+  exit
 }
 
 # sohw help
 show_help() {
-  echo -e "Kubernetes Tools - kpod"
-  echo -e "- Get pods in current namespace: kpod"
-  echo -e "- Get pods in specified [namespace]: kpod [-n] [namespace]"
-  echo -e "- Get pods in all namespaces: kpod [-a]\n"
+  echo -e $__title
+  echo
+  echo -e "- Get pods in current namespace: ${__style_underlined}kpod${__style_end}"
+  echo -e "- Describe pod: ${__style_underlined}kpod [pod_name]${__style_end}"
+  echo -e "- Get pods in all namespaces: ${__style_underlined}kpod [-a]${__style_end}\n"
 }
 
-show_help
 # parse arguments
 while [ "$1" != "" ]; do
   case $1 in
@@ -31,12 +36,13 @@ while [ "$1" != "" ]; do
       get_pods "--all-namespaces"
       ;;
     -h | --help ) shift
+      show_help
       exit 0
       ;;
-    * ) get_pods "-n $1"
+    * ) describe_pod "$1"
   esac
   shift
 done
 
 # get pods in current namespace if no arguments specified
-get_pods
+if [ $# -eq 0 ]; then get_pods; fi

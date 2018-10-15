@@ -1,21 +1,14 @@
 # Kubernetes Tools
 
-Kubernetes Tools is a set of programs that helps with your Kubernetes operations.
+Kubernetes Tools is a set of scripts that simplifies daily Kubernetes operations.
 
 #### Available tools
 ```
-===Operation===
-kns: Specify default namespace
-kctx: List and switch contexts
-kpod: List pods in specified namespace
-kds: Descirbe pod in specified namespace
-
-===Debug===
-kcp: Copy common cli tools to selected container
+kctx: List contexts, switch context
+kns: List namespaces, select default namespace
+kpod: List pods in current namespace, describe pod
 kexec: Get a shell of a selected container
-
-===Maintenance===
-kbak: Backup and restore namespace/cluster
+kcp: Copy common cli tools to selected container
 ```
 
 #### How to use
@@ -60,6 +53,11 @@ source $HOME/kubernetes-tools/completion/__completion`
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Release Note
+v2.0.0 - 15/10/2018
+- Changed to developer workflow
+- Updated kctx, kns, kpod, kcopy, kctx
+- Removed kbak, kds, klogs
+
 v1.2.0 - 08/08/2018
 - Updated kexec, kns, kpod, kctx, kds
 - Added kcp

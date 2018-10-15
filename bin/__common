@@ -1,3 +1,18 @@
+__style_end="\033[0m"
+__style_red="\033[31m"
+__style_green="\033[32m"
+__style_blue="\033[34m"
+__style_yellow="\033[33m"
+__style_cyan="\033[36m"
+__style_bold="\033[1m"
+__style_dim="\033[2m"
+__style_underlined="\033[4m"
+__style_inverted="\033[7m"
+
+__app_name="Kubernetes Tools"
+__version="v2.0.0"
+__title="$__style_yellow$__app_name $__version - $(basename -- $0)$__style_end"
+
 __current_namespace() {
   namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(current_context)\")].context.namespace}")"
   if [[ -z "${namespace}" ]]; then

@@ -92,9 +92,8 @@ __nodes ()
 }
 
 # apply autocompletions
-complete -F __pods kds klogs kexec kcp
-complete -F __namespaces kpod kns kbak
+complete -F __pods klogs kexec kcopy kpod
+complete -F __namespaces kns
 complete -F __contexts kctx
-complete -F __nodes kssh
 
 # remove autocompletion cache files e.g. .zcompdump after making changes

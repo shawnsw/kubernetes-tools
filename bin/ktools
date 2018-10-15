@@ -6,6 +6,7 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 
+source __common
 function auto_completion() {
 	echo "Adding bash completion"
 	path=$1/completion/__completion
@@ -39,27 +40,20 @@ function init() {
 
 # sohw help
 show_help() {
-  echo "Kubernetes Tools v1.2.0"
-  echo "List all tools: ktools"
-  echo "Setup auto completion: ktools init"
+  echo -e $__title
   echo
-  echo "===Operation==="
-  echo "kns: Specify default namespace"
-  echo "kctx: List and switch contexts"
-  echo "kpod: List pods in specified namespace"
-  echo "kds: Descirbe pod in specified namespace"
+  echo -e "- List all tools: ${__style_underlined}ktools${__style_end}"
+  echo -e "- Setup auto completion: ${__style_underlined}ktools [-i|--init]${__style_end}"
   echo
-  echo "===Debug==="
-  echo "kcp: Copy common cli tools to selected container"
-  echo "kexec: Get a shell of a selected container"
+  echo -e "${__style_green}kctx${__style_end}: List contexts, switch context"
+  echo -e "${__style_green}kns${__style_end}: List namespaces, select default namespace"
+  echo -e "${__style_green}kpod${__style_end}: List pods in current namespace, describe pod"
+  echo -e "${__style_green}kexec${__style_end}: Get a shell of a selected container"
+  echo -e "${__style_green}kcopy${__style_end}: Copy common cli tools to selected container"
   echo
-  echo "===Maintenance==="
-  echo "kbak: Backup and restore namespace/cluster"
-  echo
-  echo "For usage of each tool, run [tool_name] -h"
+  echo -e "For usage of each tool, run ${__style_underlined}[tool_name] -h${__style_end}\n"
 }
 
-show_help
 # parse arguments
 while [ "$1" != "" ]; do
   case $1 in
@@ -73,3 +67,6 @@ while [ "$1" != "" ]; do
   esac
   shift
 done
+
+# show help message if no arguments specified
+if [ $# -eq 0 ]; then show_help; fi

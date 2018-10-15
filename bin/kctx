@@ -5,7 +5,7 @@
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
 
-
+source __common
 show_context() {
 	echo -e "Current Context: \"$(kubectl config current-context)\"\n"
   echo "All Contexts:"
@@ -21,12 +21,12 @@ switch_context() {
 
 # sohw help
 show_help() {
-  echo -e "Kubernetes Tools - kctx"
-  echo -e "- List current and all contexts: kctx"
-  echo -e "- Switch to specified [context]: kctx [context]\n"
+  echo -e $__title
+  echo
+  echo -e "- List current and all contexts: ${__style_underlined}kctx${__style_end}"
+  echo -e "- Switch to specified [context]: ${__style_underlined}kctx [context]\n${__style_end}"
 }
 
-show_help
 # parse arguments
 while [ "$1" != "" ]; do
   case $1 in
@@ -34,6 +34,7 @@ while [ "$1" != "" ]; do
       switch_context $1
       ;;
     -h | --help ) shift
+      show_help
       exit 0
       ;;
     * ) switch_context $1
@@ -42,4 +43,4 @@ while [ "$1" != "" ]; do
 done
 
 # show current context if no argument specified
-show_context
+if [ $# -eq 0 ]; then show_context; fi

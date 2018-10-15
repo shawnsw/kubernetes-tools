@@ -15,8 +15,9 @@ list_namespaces() {
   echo "Current Namespace: $(__current_namespace)"
   echo "Current Context: $(current_context)"
   echo
-  echo "All Namespaces in current context:"
-  kubectl get ns
+  echo "All namespaces:"
+  kubectl get ns | sed ''/$(__current_namespace)/s//`printf "\033[32m$(__current_namespace)\033[0m"`/''
+  exit
 }
 
 # prompt ns select
@@ -39,15 +40,16 @@ select_ns() {
 update_context() {
     echo -e "\nSetting $1 as default namespace in current context...\n"
     kubectl config set-context $(kubectl config current-context) --namespace=$1
-    exit 0
+    exit
 }
 
 # sohw help
 show_help() {
-  echo -e "Kubernetes Tools - kns"
-  echo -e "- List current and all namespaces: kns"
-  echo -e "- Select a default namespace: kns [-s|--select]"
-  echo -e "- Specify a default [namespace]: kns [-n|--namespace] [namespace]\n"
+  echo -e $__title
+  echo
+  echo -e "- List current and all namespaces: ${__style_underlined}kns${__style_end}"
+  echo -e "- Select a default namespace: ${__style_underlined}kns [-s|--select]${__style_end}"
+  echo -e "- Specify a default namespace: ${__style_underlined}kns [namespace]${__style_end}\n"
 }
 
 # parse arguments
@@ -60,6 +62,7 @@ while [ "$1" != "" ]; do
       select_ns
       ;;
     -h | --help ) shift
+      show_help
       exit 0
       ;;
     * ) update_context $1
@@ -68,4 +71,4 @@ while [ "$1" != "" ]; do
 done
 
 # list namespaces if no arguments
-list_namespaces
+if [ $# -eq 0 ]; then list_namespaces; fi
