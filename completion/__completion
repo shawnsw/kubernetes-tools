@@ -1,5 +1,5 @@
 current_namespace() {
-  namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kuebctl config current-context)\")].context.namespace}")"
+  namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")"
   if [[ -z "${namespace}" ]]; then
     echo default
   else
