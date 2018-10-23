@@ -68,6 +68,10 @@ source $HOME/kubernetes-tools/completion/__completion`
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Release Note
+v2.0.1 - 23/10/2018
+- updated kcp from binary copy to download
+- fixed pod name auto completion
+
 v2.0.0 - 15/10/2018
 - Changed to developer workflow
 - Updated kctx, kns, kpod, kcopy, kctx
