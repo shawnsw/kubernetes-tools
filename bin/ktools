@@ -25,8 +25,20 @@ function auto_completion() {
 
 		echo -e "\n#Kubernetes Tools zsh completion start\nsource $path\n#Kubernetes Tools zsh completion end\n" >> $HOME/.bashrc
 		echo -e "\n.bashrc updated. Start a new shell to enjoy tab completion!"
+	elif [[ $SHELL = *"fish"* ]]; then
+		source_path=$1/completion/kubernetes-tools.fish
+		destination_path=$HOME/.config/fish/completions/kubernetes-tools.fish
+
+		echo -e "\nFISH detected. The following lines will be added to $HOME/.config/fish/config.fish"
+		echo -e " source $destination_path\n"
+		read -p "Press [Enter] to continue..."
+
+		cp $source_path $destination_path
+		echo -e "\n# Kubernetes Tools fish completion start\nsource $destination_path\n" >> $HOME/.config/fish/config.fish
+		echo -e "\n.config.fish updated."
+		source $destination_path
 	else
-		echo "Only BASH and ZSH supported at this stage. Sorry."
+		echo "Only BASH, FISH and ZSH are supported at this stage. Sorry."
 	fi
 }
 
