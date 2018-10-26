@@ -58,7 +58,7 @@ function copy_tools() {
   exit 0
 }
 
-# sohw help
+# show help
 show_help() {
   echo -e $__title
   echo
