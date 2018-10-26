@@ -10,7 +10,7 @@ __style_underlined="\033[4m"
 __style_inverted="\033[7m"
 
 __app_name="Kubernetes Tools"
-__version="v2.0.0"
+__version="v2.1.0"
 __title="$__style_yellow$__app_name $__version - $(basename -- $0)$__style_end"
 
 __current_namespace() {

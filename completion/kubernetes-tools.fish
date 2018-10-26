@@ -29,8 +29,9 @@ function __ktools_nodes
     printf "%s\tNode\n" (kubectl get nodes -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
 end
 
+complete -c klogs -f -a '(__ktools_pods)'
 complete -c kcopy -f -a '(__ktools_pods)'
-complete -c kctx -f -a '(__ktools_contexts)'
 complete -c kexec -f -a '(__ktools_pods)'
-complete -c kns -f -a '(__ktools_namespaces)'
 complete -c kpod -f -a '(__ktools_pods)'
+complete -c kns -f -a '(__ktools_namespaces)'
+complete -c kctx -f -a '(__ktools_contexts)'
