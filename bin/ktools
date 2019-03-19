@@ -61,6 +61,7 @@ show_help() {
   echo -e "${__style_green}kns${__style_end}: List namespaces, select default namespace"
   echo -e "${__style_green}kpod${__style_end}: List pods in current namespace, describe pod"
   echo -e "${__style_green}kexec${__style_end}: Get a shell of a selected container"
+  echo -e "${__style_green}klogs${__style_end}: Get logs of a selected container"
   echo -e "${__style_green}kcopy${__style_end}: Copy common cli tools to selected container"
   echo
   echo -e "For usage of each tool, run ${__style_underlined}[tool_name] -h${__style_end}\n"
