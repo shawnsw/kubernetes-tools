@@ -24,7 +24,7 @@ get_logs() {
     done
   fi
 
-  echo -e "\nGetting you a shell in $selected_container...\n"
+  echo -e "\nGetting logs of a shell in $selected_container...\n"
   # get logs of the slected pod
   kubectl logs $pod -c $selected_container
   exit 0
