@@ -53,7 +53,7 @@ ktools --init
 ##### BASH completion
 Add the following into your `.bash_profile`:  
 ```sh
-source $HOME/kubernetes-tools/completion/__completion`
+source $HOME/kubernetes-tools/completion/__completion
 ```
 
 ##### ZSH completion
@@ -61,7 +61,7 @@ Add the following into your `.zshrc`:
 ```sh
 autoload -U compaudit compinit bashcompinit
 compaudit && compinit && bashcompinit
-source $HOME/kubernetes-tools/completion/__completion`
+source $HOME/kubernetes-tools/completion/__completion
 ```
 
 ## License
