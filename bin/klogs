@@ -5,7 +5,10 @@
 #
 # You may use, distribute or modify this software under the terms of the MIT license.
 
-source __common
+if [[ -f __common ]]; then
+  source __common
+fi
+
 get_logs() {
   pod=${1}
   option=${2}
