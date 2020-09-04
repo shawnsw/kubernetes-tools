@@ -1,6 +1,29 @@
+function __ktools_my_current_context
+  if test -z "${KCTX}" 
+  then
+    kubectl config current-context
+  else
+    echo "${KCTX}"
+  end
+}
+
+function __ktools_my_current_namespace
+  if test -z "${KNS}" 
+  then
+    namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(current_context)\")].context.namespace}")"
+  else
+    namespace=${KNS}
+  end
+  if test -z "${namespace}" ; then
+    echo "default"
+  else
+    echo "${namespace}"
+  end
+}
+
 function __ktools_current_namespace
-    set -l current_context (kubectl config current-context)
-    set -l namespace (kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$current_context\")].context.namespace}")
+    set -l current_context (__ktools_my_current_context)
+    set -l namespace (__ktools_my_current_namespace)
 
     if test -z "$namespace"
         echo default
@@ -10,7 +33,7 @@ function __ktools_current_namespace
 end
 
 function __ktools_pods
-    set -l pods (kubectl get pods -n (__ktools_current_namespace) --ignore-not-found | sed '1d' | awk '{print $1}')
+    set -l pods (kubectl get pods --context=(__ktools_my_current_context) -n (__ktools_current_namespace) --ignore-not-found | sed '1d' | awk '{print $1}')
 
     if set -q pods[1]
         printf "%s\tPod\n" $pods
@@ -18,7 +41,7 @@ function __ktools_pods
 end
 
 function __ktools_namespaces
-    printf "%s\tNamespace\n" (kubectl get ns | sed '1d'| awk '{print $1}')
+    printf "%s\tNamespace\n" (kubectl get ns --context=(__ktools_my_current_context) | sed '1d'| awk '{print $1}')
 end
 
 function __ktools_contexts
@@ -26,7 +49,7 @@ function __ktools_contexts
 end
 
 function __ktools_nodes
-    printf "%s\tNode\n" (kubectl get nodes -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
+    printf "%s\tNode\n" (kubectl get nodes --context=(__ktools_my_current_context) -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
 end
 
 complete -c klogs -f -a '(__ktools_pods)'
