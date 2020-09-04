@@ -20,6 +20,11 @@ function get_busybox() {
 }
 
 function copy_tools() {
+  local my_context
+  local my_namespace
+  my_context=$(current_context)
+  my_namespace=$(current_namespace)
+
   # check/download busybox
   get_busybox
   # checkout shasum
@@ -28,9 +33,9 @@ function copy_tools() {
   pod=$1
   PS3="Please select a container:"
   # exit if pod not found
-  if ! kubectl get pod $pod > /dev/null; then exit 1; fi
+  if ! kubectl get pod --context="${my_context}" --namespace="${my_namespace}" $pod > /dev/null; then exit 1; fi
 
-  containers=($(kubectl get pod $pod -o jsonpath='{.spec.containers[*].name}'))
+  containers=($(kubectl get pod --context=\"${my_context}\" --namespace=\"${my_namespace}\" $pod -o jsonpath='{.spec.containers[*].name}'))
 
   # if there is only one container, get a shell
   if [[ ${#containers[@]} -eq 1 ]] ; then
@@ -48,13 +53,13 @@ function copy_tools() {
   dir=`dirname $0`
   echo $dir
   echo -e "\nCopying tools to container $selected_container...\n"
-  kubectl cp $BUSY_BOX_PATH/busybox $namespace/$pod:/tmp -c $selected_container
+  kubectl cp --context="${my_context}" --namespace="${my_namespace}" $BUSY_BOX_PATH/busybox $namespace/$pod:/tmp -c $selected_container
   # setup busybox
-  kubectl exec $pod -c $selected_container -ti -- sh -c "chmod 755 /tmp/busybox && /tmp/busybox --install /usr/bin"
+  kubectl exec --context="${my_context}" --namespace="${my_namespace}" $pod -c $selected_container -ti -- sh -c "chmod 755 /tmp/busybox && /tmp/busybox --install /usr/bin"
 
   echo -e "\nGetting you a shell in $selected_container...\n"
   # if bash doesn't work, try sh
-  kubectl exec $pod -c $selected_container -ti bash 2>/dev/null || kubectl exec $pod -c $selected_container -ti sh
+  kubectl exec --context="${my_context}" --namespace="${my_namespace}" $pod -c $selected_container -ti bash 2>/dev/null || kubectl exec $pod -c $selected_container -ti sh
   exit 0
 }
 

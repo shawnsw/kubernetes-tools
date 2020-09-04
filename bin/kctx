@@ -7,7 +7,9 @@
 
 source __common
 show_context() {
-	echo -e "Current Context: \"$(kubectl config current-context)\"\n"
+	echo -e "Default Context: \"$(kubectl config current-context)\""
+	[[ -n "${KCTX}" ]] && echo -e "Current Context: \"${KCTX}\""
+  echo ""
   echo "All Contexts:"
   kubectl config get-contexts
 }
