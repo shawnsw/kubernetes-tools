@@ -2,6 +2,15 @@
 
 Kubernetes Tools is a set of scripts that simplifies daily Kubernetes operations.
 
+Context and Namespace can be overridden per-terminal instance via KCTX and KNS environment variables:
+
+```sh
+export KCTX=my_context
+export KNS=my_namespace
+kns
+...
+```
+
 #### Available tools
 
 **kctx**: List contexts, switch context
