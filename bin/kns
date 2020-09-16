@@ -19,13 +19,15 @@ current_context() {
 list_namespaces() {
   local my_context
   local my_namespace
+  local highlight
   my_context=$(current_context)
   my_namespace=$(current_namespace)
   echo "Current Namespace: ${my_namespace}"
   echo "Current Context: ${my_context}"
   echo
   echo "All namespaces:"
-  kubectl get ns --context=${my_context} | sed ''/${my_namespace}/s//`printf "\033[32m${my_namespace}\033[0m"`/''
+  highlight=$(printf "\033[32m${my_namespace}\033[0m")
+  kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${highlight}\\1/g"
   exit
 }
 
