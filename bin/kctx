@@ -7,11 +7,16 @@
 
 source __common
 show_context() {
-	echo -e "Default Context: \"$(kubectl config current-context)\""
-	[[ -n "${KCTX}" ]] && echo -e "Current Context: \"${KCTX}\""
+  local default_context
+  local highlight
+  default_context=$(kubectl config current-context)
+  highlight=$(printf "\033[32m${default_context}\033[0m")
+
+  echo -e "Default Context: \"${default_context}\""
+  [[ -n "${KCTX}" ]] && echo -e "Current Context: \"${KCTX}\""
   echo ""
   echo "All Contexts:"
-  kubectl config get-contexts
+  kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${default_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
 }
 
 switch_context() {
