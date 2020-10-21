@@ -31,7 +31,7 @@ get_logs() {
 
   echo -e "\nGetting you logs of $selected_container...\n"
   # get logs of the slected pod
-  kubectl logs $pod -c $selected_container
+  kubectl logs --context=${my_context} --namespace=${my_namespace} $pod -c $selected_container 
   exit 0
   
 }

@@ -24,10 +24,13 @@ list_namespaces() {
   my_namespace=$(current_namespace)
   echo "Current Namespace: ${my_namespace}"
   echo "Current Context: ${my_context}"
-  echo
-  echo "All namespaces:"
-  highlight=$(printf "\033[32m${my_namespace}\033[0m")
-  kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${highlight}\\1/g"
+  if [ -z "$1" ]
+  then
+    echo
+    echo "All namespaces:"
+    highlight=$(printf "\033[32m${my_namespace}\033[0m")
+    kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${highlight}\\1/g"
+  fi
   exit
 }
 
@@ -72,6 +75,9 @@ while [ "$1" != "" ]; do
   case $1 in
     -n | --namespace ) shift
       update_context $1
+      ;;
+    -S | --short ) shift
+      list_namespaces short
       ;;
     -s | --select ) shift
       select_ns
