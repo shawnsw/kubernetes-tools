@@ -7,6 +7,10 @@
 
 source __common
 
+highlight() {
+ echo $(printf "\033[32m${1}\033[0m")
+}
+
 current_context() {
   if [[ -z "${KCTX}" ]]
   then
@@ -19,17 +23,32 @@ current_context() {
 list_namespaces() {
   local my_context
   local my_namespace
-  local highlight
+  local my_highlight
+  local display_namespace
+  local display_context
   my_context=$(current_context)
   my_namespace=$(current_namespace)
-  echo "Current Namespace: ${my_namespace}"
-  echo "Current Context: ${my_context}"
+  if [[ -n "${KCTX}" ]]
+  then
+    display_context=$(highlight ${my_context})
+  else
+    display_context=$my_context
+  fi
+  if [[ -n "${KNS}" ]]
+  then
+    display_namespace=$(highlight ${my_namespace})
+  else
+    display_namespace=$my_namespace
+  fi
+	
+  echo "Current Namespace: ${display_namespace}"
+  echo "Current Context: ${display_context}"
   if [ -z "$1" ]
   then
     echo
     echo "All namespaces:"
-    highlight=$(printf "\033[32m${my_namespace}\033[0m")
-    kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${highlight}\\1/g"
+    my_highlight=$(highlight ${my_namespace})
+    kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${my_highlight}\\1/g"
   fi
   exit
 }
