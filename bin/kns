@@ -40,7 +40,7 @@ list_namespaces() {
   else
     display_namespace=$my_namespace
   fi
-	
+
   echo "Current Namespace: ${display_namespace}"
   echo "Current Context: ${display_context}"
   if [ -z "$1" ]
@@ -48,7 +48,12 @@ list_namespaces() {
     echo
     echo "All namespaces:"
     my_highlight=$(highlight ${my_namespace})
-    kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${my_highlight}\\1/g"
+    if [[ "$show_tree" = "yes" ]]
+    then
+      kubectl hns tree --context=${my_context} -A | sed "s/${my_namespace}\\([[:space:]]\\|$\\)/${my_highlight}\\1/g"
+    else
+      kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${my_highlight}\\1/g"
+    fi
   fi
   exit
 }
@@ -100,6 +105,9 @@ while [ "$1" != "" ]; do
       ;;
     -s | --select ) shift
       select_ns
+      ;;
+    -t | --tree ) shift
+      show_tree=yes
       ;;
     -h | --help ) shift
       show_help
