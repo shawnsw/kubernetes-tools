@@ -11,7 +11,23 @@ kns
 ...
 ```
 
-#### Available tools
+## Requirements
+
+* `jq`
+* `kubectl`
+* `helm` (OPTIONAL only if you need Helm)
+* `docker` (OPTIONAL needed to run `k9s` as a container)
+
+### Supported shell types
+
+* `bash`
+* `zsh`
+
+if you're using non-supported shell you can still use the tools but you'd have to manually setup your shell as well as no autocompletion integration
+
+## Available tools
+
+**k**/**h** shotrhand wrapper around `kubectl`/`helm` that makes use of `KCTX` and `KNS` env vars
 
 **kctx**: List contexts, switch context
 
@@ -42,22 +58,43 @@ For usage of each tool, run ```[tool_name] -h```
 
 ## Installation
 
-### Install using brew
+### Generic Installation
 ```sh
-brew tap shawnxlw/homebrew-tap
-brew install kubernetes-tools
-ktools --init
+cd ~/some/dir
+git clone https://github.com/shawnxlw/kubernetes-tools
+cd kubernetes-tools
+./setup.sh
 ```
 
-### Manual installation
+#### setup.sh
+
+* if you run `setup.sh` from within directory *other* than `kubernetes-tools` location, pass path to the `kubernetes-tools`
+
 ```sh
-cd ~
+cd ~/some/dir
 git clone https://github.com/shawnxlw/kubernetes-tools
-# add the follow to your .bash_profile or .zshrc
-PATH=$HOME/kubernetes-tools/bin:$PATH
-# set up tab completion
-ktools --init
+./setup.sh kubernetes-tools
 ```
+* **INSTALL_MODE** copy vs link: you can either copy shell-specific files into your home directory or merely link to your `kubernetes-tools` directory (default is `link`):
+
+```sh
+INSTALL_MODE=copy ./setup.sh 
+```
+
+* **SHELL_TYPE** - identify your shell type (default is `bash`)
+
+```sh
+SHELL_TYPE=zsh ./setup.sh 
+```
+
+* or override all at once:
+
+```sh
+cd ~/some/dir
+git clone https://github.com/shawnxlw/kubernetes-tools
+INSTALL_MODE=copy SHELL_TYPE=zsh ./setup.sh kubernetes-tools
+```
+
 
 ##### BASH completion
 Add the following into your `.bash_profile`:  
