@@ -42,5 +42,15 @@ else
     echo "Added ${KTOOLS_PATH}/bin to your path:"
     echo "export PATH=\${PATH}:${KTOOLS_PATH}/bin" >> ${SHELL_RC_FILE}
 fi
+
+if [ "${SHELL_TYPE}" = "zsh" ]
+then
+cat >> ${SHELL_RC_FILE} << EOF
+source <(kubectl completion zsh)
+source <(helm completion zsh)
+compdef k=kubectl
+compdef h=helm
+EOF
+fi
 export PATH=${PATH}:${KTOOLS_PATH}/bin
 ktools --init

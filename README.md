@@ -108,6 +108,10 @@ Add the following into your `.zshrc`:
 autoload -U compaudit compinit bashcompinit
 compaudit && compinit && bashcompinit
 source $HOME/kubernetes-tools/completion/__completion
+source <(kubectl completion zsh)
+source <(helm completion zsh)
+compdef k=kubectl
+compdef h=helm
 ```
 
 ###### Powerlevel10k
@@ -130,6 +134,8 @@ Autoprompt for zsh's `powerlevel10k`:
   typeset -g POWERLEVEL9K_KTOOLS_SHOW_ON_COMMAND='k|h|kns|kctx|klogs|k9s|kcopy|kexec|kpod'
 
 ```
+
+then add `ktools` to either `POWERLEVEL9K_(RIGHT|LEFT)_PROMPT_ELEMENTS`
 
 ## License
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
