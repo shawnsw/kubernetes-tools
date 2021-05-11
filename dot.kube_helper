@@ -7,7 +7,7 @@ NAMESPACE_OPT=${NAMESPACE_OPT:-"--namespace"}
 if [ -n "${KCTX}" ] 
 then
   CONTEXT="${CONTEXT_OPT}=${KCTX}"
-  config=$(kubectl config view -o json | jq -y ".contexts[] | select(.name==\"${KCTX}\")")
+  config=$(kubectl config view -o json | jq ".contexts[] | select(.name==\"${KCTX}\")")
   cluster=$(echo "${config}" | jq -r '.context.cluster') 
   [ -t 1 ] && \
    /bin/echo -e "${Dark_Gray}Setting context${RESET}: ${Light_Green}${KCTX}${RESET} in ${Light_Blue}${cluster}${RESET} cluster"

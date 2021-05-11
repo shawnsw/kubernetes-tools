@@ -110,6 +110,27 @@ compaudit && compinit && bashcompinit
 source $HOME/kubernetes-tools/completion/__completion
 ```
 
+###### Powerlevel10k
+
+Autoprompt for zsh's `powerlevel10k`:
+
+```sh
+  function prompt_ktools() {
+    # source ${HOME}/.kube_helper
+    [[ -z "${KCTX}" ]] && KCTX=$(kubectl config current-context)
+    [[ -z "${KNS}" ]] && KNS="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${KCTX}\")].context.namespace}")"
+    KNS=${KNS:-"default"}
+    p10k segment -f 208 -t "${KCTX}/${KNS}"
+  }
+
+  function instant_prompt_ktools() {
+    prompt_ktools
+  }
+
+  typeset -g POWERLEVEL9K_KTOOLS_SHOW_ON_COMMAND='k|h|kns|kctx|klogs|k9s|kcopy|kexec|kpod'
+
+```
+
 ## License
 This software is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
