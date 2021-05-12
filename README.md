@@ -120,8 +120,8 @@ Autoprompt for zsh's `powerlevel10k`:
 
 ```sh
  function prompt_ktools() {
-    local _context
-    local _namespace
+    local _context=${(V)KCTX}
+    local _namespace=${(V)KNS}
     [[ -z "${(V)KCTX}" ]] && _context=$(kubectl config current-context)
     [[ -z "${(V)KNS}" ]] && _namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${_context}\")].context.namespace}")"
     _namespace=${(V)_namespace:-"default"}
