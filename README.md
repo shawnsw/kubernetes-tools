@@ -119,12 +119,13 @@ compdef h=helm
 Autoprompt for zsh's `powerlevel10k`:
 
 ```sh
-  function prompt_ktools() {
-    # source ${HOME}/.kube_helper
-    [[ -z "${KCTX}" ]] && KCTX=$(kubectl config current-context)
-    [[ -z "${KNS}" ]] && KNS="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${KCTX}\")].context.namespace}")"
-    KNS=${KNS:-"default"}
-    p10k segment -f 208 -t "${KCTX}/${KNS}"
+ function prompt_ktools() {
+    local _context
+    local _namespace
+    [[ -z "${(V)KCTX}" ]] && _context=$(kubectl config current-context)
+    [[ -z "${(V)KNS}" ]] && _namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${_context}\")].context.namespace}")"
+    _namespace=${(V)_namespace:-"default"}
+    p10k segment -b 051 -f white -t "${(V)_context}/${(V)_namespace}"
   }
 
   function instant_prompt_ktools() {
