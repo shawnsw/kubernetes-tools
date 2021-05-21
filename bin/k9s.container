@@ -2,11 +2,15 @@
 
 KUBECONFIG=${HOME}/.kube/config
 K9SCONFIG=${HOME}/.k9s
+GCLOUD=/usr/lib64/google-cloud-sdk/bin/gcloud
 . ${HOME}/.kube_helper
+
 
 MOUNT_K9SCONFIG=""
 MOUNT_KUBECONFIG=""
+MOUNT_GCLOUD=""
 [ -f "${KUBECONFIG}" ] && MOUNT_KUBECONFIG="-v ${KUBECONFIG}:/root/.kube/config"
 [ -d "${K9SCONFIG}" ] && MOUNT_K9SCONFIG="-v ${K9SCONFIG}:/root/.k9s"
+[ -f "${GCLOUD}" ] && MOUNT_GCLOUD="-v ${GCLOUD}:${GCLOUD}"
 
 docker run --rm --network=host -it ${MOUNT_KUBECONFIG} ${MOUNT_K9SCONFOG} quay.io/derailed/k9s ${NAMESPACE} ${CONTEXT} $@

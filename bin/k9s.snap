@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. ${HOME}/.kube_helper
+export KUBECONFIG=${HOME}/.kube/config
+
+k9s ${NAMESPACE} ${CONTEXT} $@
