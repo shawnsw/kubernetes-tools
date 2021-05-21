@@ -1,6 +1,8 @@
 #!/bin/sh
 
 . ${HOME}/.kube_helper
+
+# https://github.com/derailed/k9s/issues/240
 export KUBECONFIG=${HOME}/.kube/config
 
 k9s ${NAMESPACE} ${CONTEXT} $@
