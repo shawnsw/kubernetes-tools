@@ -13,8 +13,22 @@ __app_name="Kubernetes Tools"
 __version="v2.1.0"
 __title="$__style_yellow$__app_name $__version - $(basename -- $0)$__style_end"
 
-__current_namespace() {
-  namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(current_context)\")].context.namespace}")"
+current_context() {
+  if [[ -z "${KCTX}" ]]
+  then
+    kubectl config current-context
+  else
+    echo "${KCTX}"
+  fi
+}
+
+current_namespace() {
+  if [[ -z "${KNS}" ]]
+  then
+    namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(current_context)\")].context.namespace}")"
+  else
+    namespace=${KNS}
+  fi
   if [[ -z "${namespace}" ]]; then
     echo "default"
   else

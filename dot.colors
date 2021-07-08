@@ -1,0 +1,32 @@
+## Black       0;30     Dark Gray     1;30
+## Blue        0;34     Light Blue    1;34
+## Green       0;32     Light Green   1;32
+## Cyan        0;36     Light Cyan    1;36
+## Red         0;31     Light Red     1;31
+## Purple      0;35     Light Purple  1;35
+## Brown       0;33     Yellow        1;33
+## Light Gray  0;37     White         1;37
+
+
+Black="\033[0;30m" 
+Blue="\033[0;34m" 
+Green="\033[0;32m" 
+Cyan="\033[0;36m" 
+Red="\033[0;31m" 
+Purple="\033[0;35m" 
+Brown="\033[0;33m" 
+Light_Gray="\033[0;37m" 
+
+
+Dark_Gray="\033[1;30m"
+Light_Blue="\033[1;34m"
+Light_Green="\033[1;32m"
+Light_Cyan="\033[1;36m"
+Light_Red="\033[1;31m"
+Light_Purple="\033[1;35m"
+Yellow="\033[1;33m"
+White="\033[1;37m"
+
+RESET="\033[00m"
+
+
