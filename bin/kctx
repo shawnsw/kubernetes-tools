@@ -6,6 +6,7 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 source __common
+YQ=${YQ:-"yq-go"}
 show_context() {
   local default_context
   local highlight
@@ -16,7 +17,31 @@ show_context() {
   [[ -n "${KCTX}" ]] && echo -e "Current Context: \"${KCTX}\""
   echo ""
   echo "All Contexts:"
-  kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${default_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
+  if [ -n "$(command -v ${YQ})" ]
+  then
+    post_process="${YQ} -I 4 -P eval . -"
+    sed_cmd="s/^${default_context}\\:/${highlight}:/"
+  else
+    post_process="cat"
+    sed_cmd="s/\\(\"\\)${default_context}\\(\"\\)/\\1${highlight}\\2/"
+  fi
+  if [ "${short_output}" == "true" ]
+  then
+    jq_command='.contexts[] | .name'
+    post_process="cat"
+    sed_cmd="s/^${default_context}\$/${highlight}/"
+  else
+    jq_command='[.contexts[] |  { "key": .name, "value": { "cluster": .context.cluster, "user": .context.user, "namespace": .context.namespace}}]|from_entries'
+  fi
+  if [ -n "$(command -v jq)" ]
+  then
+    kubectl config view -o json \
+     | jq -rM "${jq_command}" \
+     | $post_process \
+     | sed $sed_cmd
+  else
+    kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${default_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
+  fi
 }
 
 switch_context() {
@@ -37,6 +62,9 @@ show_help() {
 # parse arguments
 while [ "$1" != "" ]; do
   case $1 in
+    -s | --short ) shift
+      short_output="true"
+      ;;
     -c | --context ) shift
       switch_context $1
       ;;

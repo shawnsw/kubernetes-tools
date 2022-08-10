@@ -3,6 +3,7 @@
 . ${HOME}/.kube_helper
 
 # https://github.com/derailed/k9s/issues/240
-export KUBECONFIG=${HOME}/.kube/config
 
-k9s ${NAMESPACE} ${CONTEXT} $@
+export KUBECONFIG=${KUBECONFIG:-${HOME}/.kube/config}
+
+${HOME}/.local/bin/k9s ${NAMESPACE} ${CONTEXT} "$@"

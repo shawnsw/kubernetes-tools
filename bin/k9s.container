@@ -1,7 +1,10 @@
 #!/bin/sh
 
-KUBECONFIG=${HOME}/.kube/config
+K9S_IMAGE=${K9S_IMAGE:-quay.io/derailed/k9s}
+KUBECONFIG=${KUBECONFIG:-${HOME}/.kube/config}
+GCLOUD_CONFIG=${GCLOUD_CONFIG:-${HOME}/.config/gcloud}
 K9SCONFIG=${HOME}/.k9s
+SELINUX=${SELINUX:-":Z"}
 GCLOUD=/usr/lib64/google-cloud-sdk/bin/gcloud
 . ${HOME}/.kube_helper
 
@@ -9,8 +12,10 @@ GCLOUD=/usr/lib64/google-cloud-sdk/bin/gcloud
 MOUNT_K9SCONFIG=""
 MOUNT_KUBECONFIG=""
 MOUNT_GCLOUD=""
-[ -f "${KUBECONFIG}" ] && MOUNT_KUBECONFIG="-v ${KUBECONFIG}:/root/.kube/config"
-[ -d "${K9SCONFIG}" ] && MOUNT_K9SCONFIG="-v ${K9SCONFIG}:/root/.k9s"
-[ -f "${GCLOUD}" ] && MOUNT_GCLOUD="-v ${GCLOUD}:${GCLOUD}"
 
-docker run --rm --network=host -it ${MOUNT_KUBECONFIG} ${MOUNT_K9SCONFOG} quay.io/derailed/k9s ${NAMESPACE} ${CONTEXT} $@
+[ -f "${KUBECONFIG}" ] && MOUNT_KUBECONFIG="-v $(realpath ${KUBECONFIG}):/root/.kube/config${SELINUX}"
+[ -d "${K9SCONFIG}" ] && MOUNT_K9SCONFIG="-v ${K9SCONFIG}:/root/.k9s${SELINUX}"
+# [ -f "${GCLOUD}" ] && MOUNT_GCLOUD="-v ${GCLOUD}:${GCLOUD}${SELINUX}"
+[ -d "${GCLOUD_CONFIG}" ] && MOUNT_GCLOUD="${MOUNT_GCLOUD} -v ${GCLOUD_CONFIG}:/root/.config/gcloud${SELINUX}"
+
+podman run --rm --network=host -it ${MOUNT_KUBECONFIG} ${MOUNT_K9SCONFOG} ${MOUNT_GCLOUD} ${K9S_IMAGE} ${NAMESPACE} ${CONTEXT} $@
