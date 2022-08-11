@@ -4,6 +4,12 @@
 CONTEXT_OPT=${CONTEXT_OPT:-"--context"}
 NAMESPACE_OPT=${NAMESPACE_OPT:-"--namespace"}
 
+if [[ -n "${KUBECONFIG}" ]]
+then
+  [ -t 1 ] && \
+    /bin/echo -e "KUBECONFIG:      ${Yellow}${KUBECONFIG}${RESET}"
+fi
+
 if [ -n "${KCTX}" ] 
 then
   CONTEXT="${CONTEXT_OPT}=${KCTX}"

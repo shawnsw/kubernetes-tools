@@ -11,25 +11,41 @@ show_context() {
   local default_context
   local highlight
   default_context=$(kubectl config current-context)
-  highlight=$(printf "\033[32m${default_context}\033[0m")
 
+  if [[ -n "${KUBECONFIG}" ]]
+  then
+    printf "KUBECONFIG:      \033[33;1m${KUBECONFIG}\033[0m\n"
+  fi
   echo -e "Default Context: \"${default_context}\""
-  [[ -n "${KCTX}" ]] && echo -e "Current Context: \"${KCTX}\""
+  if [[ -n "${KCTX}" ]] 
+  then
+    echo -e "Current Context: \"${KCTX}\""
+    active_context=${KCTX}
+  else
+    active_context=${default_context}
+  fi
+
+  highlight=$(printf "\033[32m${active_context}\033[0m")
+
+  if [ "${short_output}" == "brief" ]
+  then
+    return 0
+  fi
   echo ""
   echo "All Contexts:"
   if [ -n "$(command -v ${YQ})" ]
   then
     post_process="${YQ} -I 4 -P eval . -"
-    sed_cmd="s/^${default_context}\\:/${highlight}:/"
+    sed_cmd="s/^${active_context}\\:/${highlight}:/"
   else
     post_process="cat"
-    sed_cmd="s/\\(\"\\)${default_context}\\(\"\\)/\\1${highlight}\\2/"
+    sed_cmd="s/\\(\"\\)${active_context}\\(\"\\)/\\1${highlight}\\2/"
   fi
   if [ "${short_output}" == "true" ]
   then
     jq_command='.contexts[] | .name'
     post_process="cat"
-    sed_cmd="s/^${default_context}\$/${highlight}/"
+    sed_cmd="s/^${active_context}\$/${highlight}/"
   else
     jq_command='[.contexts[] |  { "key": .name, "value": { "cluster": .context.cluster, "user": .context.user, "namespace": .context.namespace}}]|from_entries'
   fi
@@ -40,7 +56,7 @@ show_context() {
      | $post_process \
      | sed $sed_cmd
   else
-    kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${default_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
+    kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${active_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
   fi
 }
 
@@ -60,10 +76,14 @@ show_help() {
 }
 
 # parse arguments
+short_output="true"
 while [ "$1" != "" ]; do
   case $1 in
+    -l | --long ) shift
+      short_output="false"
+      ;;
     -s | --short ) shift
-      short_output="true"
+      short_output="brief"
       ;;
     -c | --context ) shift
       switch_context $1

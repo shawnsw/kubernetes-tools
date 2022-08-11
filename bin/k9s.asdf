@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. ${HOME}/.kube_helper
+
+# https://github.com/derailed/k9s/issues/240
+
+export KUBECONFIG=${KUBECONFIG:-${HOME}/.kube/config}
+
+${HOME}/.asdf/shims/k9s ${NAMESPACE} ${CONTEXT} "$@"
