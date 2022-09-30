@@ -26,7 +26,7 @@ get_shell() {
 
   echo -e "\nGetting you a shell in $selected_container...\n"
   # if bash doesn't work, try sh
-  kubectl exec $pod -c $selected_container -ti bash 2>/dev/null || kubectl exec $pod -c $selected_container -ti sh
+  kubectl exec $pod -c $selected_container -ti -- bash 2>/dev/null || kubectl exec $pod -c $selected_container -ti -- sh
   exit 0
   
 }
