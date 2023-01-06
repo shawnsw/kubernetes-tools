@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # To override default values for setup use:
 ## 1. setup.sh /my/path for pointing to location of kubernetes-tools
@@ -35,7 +35,7 @@ esac
 
 SHELL_RC_FILE="${HOME}/.${SHELL_TYPE}rc"
 
-if sed 's/#.*$//' ${SHELL_RC_FILE} | grep -qF "${KTOOLS_PATH}/bin" "${SHELL_RC_FILE}" 
+if sed 's/#.*$//' ${SHELL_RC_FILE} | grep -qF "${KTOOLS_PATH}/bin" "${SHELL_RC_FILE}"
 then
     echo "${KTOOLS_PATH}/bin is already in your PATH in ${SHELL_RC_FILE}"
 else

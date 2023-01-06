@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 K9S_IMAGE=${K9S_IMAGE:-quay.io/derailed/k9s}
 KUBECONFIG=${KUBECONFIG:-${HOME}/.kube/config}
