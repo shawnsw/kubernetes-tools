@@ -8,12 +8,20 @@
 source __common
 # get pods
 get_pods() {
-  kubectl get pod $1
+  local my_context
+  local my_namespace
+  my_context=$(current_context)
+  my_namespace=$(current_namespace)
+  kubectl get pod --context="${my_context}" --namespace="${my_namespace}" $1
   exit
 }
 
 describe_pod() {
-  kubectl describe pod $1
+  local my_context
+  local my_namespace
+  my_context=$(current_context)
+  my_namespace=$(current_namespace)
+  kubectl describe pod --context="${my_context}" --namespace="${my_namespace}" $1
   exit
 }
 

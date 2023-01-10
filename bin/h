@@ -1,0 +1,6 @@
+#!/bin/bash
+
+CONTEXT_OPT="--kube-context"
+. ${HOME}/.kube_helper
+
+helm ${NAMESPACE} ${CONTEXT} $@

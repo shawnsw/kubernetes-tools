@@ -7,26 +7,66 @@
 
 source __common
 
+highlight() {
+ echo $(printf "\033[32m${1}\033[0m")
+}
+
 current_context() {
-  kubectl config current-context
+  if [[ -z "${KCTX}" ]]
+  then
+    kubectl config current-context
+  else
+    echo "${KCTX}"
+  fi
 }
 
 list_namespaces() {
-  echo "Current Namespace: $(__current_namespace)"
-  echo "Current Context: $(current_context)"
-  echo
-  echo "All namespaces:"
-  kubectl get ns | sed ''/$(__current_namespace)/s//`printf "\033[32m$(__current_namespace)\033[0m"`/''
+  local my_context
+  local my_namespace
+  local my_highlight
+  local display_namespace
+  local display_context
+  my_context=$(current_context)
+  my_namespace=$(current_namespace)
+  if [[ -n "${KCTX}" ]]
+  then
+    display_context=$(highlight ${my_context})
+  else
+    display_context=$my_context
+  fi
+  if [[ -n "${KNS}" ]]
+  then
+    display_namespace=$(highlight ${my_namespace})
+  else
+    display_namespace=$my_namespace
+  fi
+
+  echo "Current Namespace: ${display_namespace}"
+  echo "Current Context: ${display_context}"
+  if [ -z "$1" ]
+  then
+    echo
+    echo "All namespaces:"
+    my_highlight=$(highlight ${my_namespace})
+    if [[ "$show_tree" = "yes" ]]
+    then
+      kubectl hns tree --context=${my_context} -A | sed "s/${my_namespace}\\([[:space:]]\\|$\\)/${my_highlight}\\1/g"
+    else
+      kubectl get ns --context=${my_context} | sed "s/${my_namespace}\\([[:space:]]\\)/${my_highlight}\\1/g"
+    fi
+  fi
   exit
 }
 
 # prompt ns select
 select_ns() {
+  local my_context
+  my_context=$(current_context)
   echo -e "Setting default namespace:\n"
   PS3="Please select a namespace:"
   OLD_IFS="$IFS"
   IFS=$'\n'
-  NAMESPACES=($(kubectl get ns |awk '{print $1}'|sed '1d'))
+  NAMESPACES=($(kubectl get ns --context=${my_context} |awk '{print $1}'|sed '1d'))
   IFS="$OLD_IFS"
 
   select namespace in "${NAMESPACES[@]}"
@@ -38,8 +78,10 @@ select_ns() {
 
 # update context
 update_context() {
+    local my_context
     echo -e "\nSetting $1 as default namespace in current context...\n"
-    kubectl config set-context $(kubectl config current-context) --namespace=$1
+    my_context=$(current_context)
+    kubectl config set-context ${my_context} --namespace=$1
     exit
 }
 
@@ -58,8 +100,14 @@ while [ "$1" != "" ]; do
     -n | --namespace ) shift
       update_context $1
       ;;
+    -S | --short ) shift
+      list_namespaces short
+      ;;
     -s | --select ) shift
       select_ns
+      ;;
+    -t | --tree ) shift
+      show_tree=yes
       ;;
     -h | --help ) shift
       show_help

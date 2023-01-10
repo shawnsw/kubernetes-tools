@@ -1,12 +1,25 @@
-current_namespace() {
-  namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")"
-  if [[ -z "${namespace}" ]]; then
-    echo default
+current_context() {
+  if [[ -z "${KCTX}" ]]
+  then
+    kubectl config current-context
   else
-    echo $namespace
+    echo "${KCTX}"
   fi
 }
 
+current_namespace() {
+  if [[ -z "${KNS}" ]]
+  then
+    namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(current_context)\")].context.namespace}")"
+  else
+    namespace=${KNS}
+  fi
+  if [[ -z "${namespace}" ]]; then
+    echo "default"
+  else
+    echo "${namespace}"
+  fi
+}
 __pods ()
 {
   # pointer to current completion word.
@@ -15,7 +28,7 @@ __pods ()
   # array variable storing the possible completions.
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
-  namespaces=$(kubectl get pod -n $(current_namespace)|sed '1d'|awk '{print $1}')
+  namespaces=$(kubectl get pod --context=$(current_context) -n $(current_namespace)|sed '1d'|awk '{print $1}')
 
   COMPREPLY=( $( compgen -W "$namespaces" -- $cur ) )
 
@@ -36,7 +49,7 @@ __namespaces ()
   # array variable storing the possible completions.
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
-  namespaces=$(kubectl get ns |sed '1d'|awk '{print $1}')
+  namespaces=$(kubectl get ns --context=$(current_context) |sed '1d'|awk '{print $1}')
 
   COMPREPLY=( $( compgen -W "$namespaces" -- $cur ) )
 
@@ -78,7 +91,7 @@ __nodes ()
   # array variable storing the possible completions.
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
-  ips=$(kubectl get nodes -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
+  ips=$(kubectl get nodes --context=$(current_context) -o json | jq -r '.items[].status.addresses[].address' | paste - - - | cut -f 1)
 
   COMPREPLY=( $( compgen -W "$ips" -- $cur ) )
 

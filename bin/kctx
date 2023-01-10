@@ -6,10 +6,58 @@
 # You may use, distribute or modify this software under the terms of the MIT license.
 
 source __common
+YQ=${YQ:-"yq-go"}
 show_context() {
-	echo -e "Current Context: \"$(kubectl config current-context)\"\n"
+  local default_context
+  local highlight
+  default_context=$(kubectl config current-context)
+
+  if [[ -n "${KUBECONFIG}" ]]
+  then
+    printf "KUBECONFIG:      \033[33;1m${KUBECONFIG}\033[0m\n"
+  fi
+  echo -e "Default Context: \"${default_context}\""
+  if [[ -n "${KCTX}" ]] 
+  then
+    echo -e "Current Context: \"${KCTX}\""
+    active_context=${KCTX}
+  else
+    active_context=${default_context}
+  fi
+
+  highlight=$(printf "\033[32m${active_context}\033[0m")
+
+  if [ "${short_output}" == "brief" ]
+  then
+    return 0
+  fi
+  echo ""
   echo "All Contexts:"
-  kubectl config get-contexts
+  if [ -n "$(command -v ${YQ})" ]
+  then
+    post_process="${YQ} -I 4 -P eval . -"
+    sed_cmd="s/^${active_context}\\:/${highlight}:/"
+  else
+    post_process="cat"
+    sed_cmd="s/\\(\"\\)${active_context}\\(\"\\)/\\1${highlight}\\2/"
+  fi
+  if [ "${short_output}" == "true" ]
+  then
+    jq_command='.contexts[] | .name'
+    post_process="cat"
+    sed_cmd="s/^${active_context}\$/${highlight}/"
+  else
+    jq_command='[.contexts[] |  { "key": .name, "value": { "cluster": .context.cluster, "user": .context.user, "namespace": .context.namespace}}]|from_entries'
+  fi
+  if [ -n "$(command -v jq)" ]
+  then
+    kubectl config view -o json \
+     | jq -rM "${jq_command}" \
+     | $post_process \
+     | sed $sed_cmd
+  else
+    kubectl config get-contexts | sed "s/\\(\\*[[:space:]]\\+\\)${active_context}\\([[:space:]]\\)/\\1${highlight}\\2/"
+  fi
 }
 
 switch_context() {
@@ -28,8 +76,15 @@ show_help() {
 }
 
 # parse arguments
+short_output="true"
 while [ "$1" != "" ]; do
   case $1 in
+    -l | --long ) shift
+      short_output="false"
+      ;;
+    -s | --short ) shift
+      short_output="brief"
+      ;;
     -c | --context ) shift
       switch_context $1
       ;;

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. ${HOME}/.kube_helper
+
+if ( echo "$@" | grep -qe 'hns' )
+then
+  kubectl $@ ${CONTEXT} ${NAMESPACE}
+else
+  kubectl ${CONTEXT} ${NAMESPACE} $@
+fi
